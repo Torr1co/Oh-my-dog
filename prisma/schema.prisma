@@ -14,37 +14,104 @@ datasource db {
     url      = env("DATABASE_URL")
 }
 
-model Example {
-    id        String   @id @default(cuid()) @map("_id")
+//https://www.prisma.io/docs/concepts/components/prisma-schema/relations
+//https://www.prisma.io/docs/concepts/components/prisma-schema/relations
+//https://www.prisma.io/docs/concepts/components/prisma-schema/data-model
+
+
+//----------------------------- USER ---------------------------------
+model User {
+    id                String      @id @default(cuid()) @map("_id") @db.ObjectId
+    created_at        DateTime    @default(now())
+    updated_at        DateTime    @updatedAt
+    name              String
+    email             String      @unique
+    dni               String      @unique
+    role              UserRoles
+    password          String
+    telephone_number  String?
+    password_verified DateTime?
+    dogs              ClientDog[]
+}
+// ---------x---------------------            ---------------------------------
+model ClientDog {
+    id             String     @id @default(auto()) @map("_id") @db.ObjectId
+    created_at     DateTime   @default(now())
+    updated_at     DateTime   @updatedAt
+    name           String
+    age            Int
+    gender         String
+    img            String?
+    color          String
+    lets_cross     Boolean    @default(false)
+    weight         Float
+    race           String
+    health_book    HealthBook @relation(fields: [health_book_id], references: [id], onDelete: Cascade)
+    health_book_id String     @unique @db.ObjectId
+    ownerId        String     @db.ObjectId
+    owner          User       @relation(fields: [ownerId], references: [id], onDelete: Cascade)
+}
+//------------------------------- HEALTH BOOK ---------------------------------
+model HealthBook {
+    id           String      @id @default(auto()) @map("_id") @db.ObjectId
+    createdAt    DateTime    @default(now())
+    updatedAt    DateTime    @updatedAt
+    vaccines     Vaccine[]
+    inquiries    Inquirie[]
+    dewormings   Deworming[]
+    observations String?
+    dog          ClientDog?
+}
+// ------------------------------            ---------------------------------
+model Inquirie {
+    id             String      @id @default(auto()) @map("_id") @db.ObjectId
+    date           String
+    observations   String?
+    weight         Float?
+    healthBook     HealthBook? @relation(fields: [health_book_id], references: [id], onDelete: Cascade)
+    health_book_id String      @unique @db.ObjectId
+}
+// ------------------------------            ---------------------------------
+model Deworming {
+    id             String      @id @default(auto()) @map("_id") @db.ObjectId
+    date           DateTime
+    product        String
+    dosis          String
+    healthBook     HealthBook? @relation(fields: [health_book_id], references: [id], onDelete: Cascade)
+    health_book_id String      @unique @db.ObjectId
+}
+// ------------------------------            ---------------------------------
+model Vaccine {
+    id             String      @id @default(auto()) @map("_id") @db.ObjectId
+    lot            String
+    date           DateTime
+    lab            String
+    healthBook     HealthBook? @relation(fields: [health_book_id], references: [id], onDelete: Cascade)
+    health_book_id String      @unique @db.ObjectId
+}
+// ------------------------------     ADOPTION       ---------------------------------
+model PublicactionDog {
+    id        String   @id @default(auto()) @map("_id") @db.ObjectId
     createdAt DateTime @default(now())
     updatedAt DateTime @updatedAt
 }
 
 // Necessary for Next auth
 model Account {
-    id                String  @id @default(auto())  @map("_id") @db.ObjectId
+    id                String  @id @default(auto()) @map("_id") @db.ObjectId
     userId            String  @db.ObjectId
     type              String
     provider          String
     providerAccountId String
-    refresh_token     String?  @db.String
-    access_token      String?  @db.String
+    refresh_token     String? @db.String
+    access_token      String? @db.String
     expires_at        Int?
     token_type        String?
     scope             String?
-    id_token          String?  @db.String
+    id_token          String? @db.String
     session_state     String?
-    user              User    @relation(fields: [userId], references: [id], onDelete: Cascade)
 
     @@unique([provider, providerAccountId])
-}
-
-model Session {
-    id           String   @id @default(auto())  @map("_id") @db.ObjectId
-    sessionToken String   @unique
-    userId       String   @db.ObjectId
-    expires      DateTime
-    user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
 }
 
 enum UserRoles {
@@ -52,19 +119,8 @@ enum UserRoles {
     CLIENT
 }
 
-model User {
-    id            String    @id @default(auto())  @map("_id") @db.ObjectId
-    name          String    
-    email         String   @unique
-    role          UserRoles
-    password      String    
-    passwordVerified DateTime?
-    accounts      Account[]
-    sessions      Session[]
-}
-
 model VerificationToken {
-    identifier String  @id @default(auto())  @map("_id") @db.ObjectId
+    identifier String   @id @default(auto()) @map("_id") @db.ObjectId
     token      String   @unique
     expires    DateTime
 
