@@ -1,6 +1,6 @@
 import React, { useState } from "react";
-import { NextPage } from "next";
-import { signIn, signOut, useSession } from "next-auth/react";
+import { type NextPage, type GetServerSideProps } from "next";
+import { signIn } from "next-auth/react";
 import Form from "~/lib/Form";
 import { useForm } from "react-hook-form";
 import Button from "~/lib/Button";
@@ -10,6 +10,8 @@ import Title from "~/lib/Typo/Title";
 import Box from "~/lib/Box";
 import { Blob, Blob2 } from "~/lib/icons";
 import { toast } from "react-hot-toast";
+import { useRouter } from "next/router";
+import { getServerAuthSession } from "~/server/auth";
 
 const AuthSchema = z.object({
   email: z.string().email("Email invalido"),
@@ -18,12 +20,12 @@ const AuthSchema = z.object({
 type Auth = z.infer<typeof AuthSchema>;
 
 const SignIn: NextPage = () => {
-  const { data: sessionData } = useSession();
   const [loading, setLoading] = useState(false);
 
   const methods = useForm<Auth>({
     resolver: zodResolver(AuthSchema),
   });
+  const router = useRouter();
   return (
     <div className="relative mx-auto max-w-xl">
       <div className="absolute -bottom-24 -left-28">
@@ -35,19 +37,21 @@ const SignIn: NextPage = () => {
       <Box className=" relative z-30 bg-white shadow-xl" kind={Box.KINDS.basic}>
         <Form
           methods={methods}
-          onSubmit={async (data) => {
-            if (!data.email || !data.password) return console.log("no data");
+          onSubmit={async (credentials) => {
+            if (!credentials.email || !credentials.password) {
+              toast.error("Credenciales invalidas");
+              return;
+            }
             setLoading(true);
 
             await signIn("credentials", {
-              ...data,
-              callbackUrl: "/",
-            }).then((res) => {
-              if (res && !res.ok) {
-                if (res?.status === 401) {
-                  toast.error("Credenciales invalidas");
-                }
-                toast.error("Error al iniciar sesion");
+              ...credentials,
+              redirect: false,
+            }).then(async (res) => {
+              if (res && res.ok) {
+                await router.push("/");
+              } else {
+                toast.error("Credenciales invalidas");
               }
             });
             setLoading(false);
@@ -69,7 +73,7 @@ const SignIn: NextPage = () => {
             path="password"
           />
           <div>
-            <Button type="submit" disabled={loading}>
+            <Button type="submit" loading={loading}>
               Iniciar Sesion
             </Button>
           </div>
@@ -77,6 +81,21 @@ const SignIn: NextPage = () => {
       </Box>
     </div>
   );
+};
+
+export const getServerSideProps: GetServerSideProps = async (ctx) => {
+  const session = await getServerAuthSession(ctx);
+  if (session) {
+    return {
+      redirect: {
+        destination: "/",
+        permanent: false,
+      },
+    };
+  }
+  return {
+    props: {},
+  };
 };
 
 export default SignIn;

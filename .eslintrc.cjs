@@ -26,7 +26,6 @@ const config = {
   rules: {
     "no-console": "warn",
     "no-nested-ternary": "off",
-    "no-unused-vars": "error",
     "no-use-before-define": "off",
     "react/react-in-jsx-scope": "off",
     "react/jsx-curly-newline": "off",
@@ -44,7 +43,7 @@ const config = {
     "@typescript-eslint/no-unnecessary-condition": "error",
     "@typescript-eslint/no-unused-vars": [
       "error",
-      /* { argsIgnorePattern: "^_", ignoreRestSiblings: true }, */
+      { argsIgnorePattern: "^_", ignoreRestSiblings: true },
     ],
     "@typescript-eslint/no-use-before-define": ["error"],
     "@typescript-eslint/no-var-requires": "off",

@@ -68,6 +68,7 @@ export const createTRPCContext = async (opts: CreateNextContextOptions) => {
 import { initTRPC, TRPCError } from "@trpc/server";
 import superjson from "superjson";
 import { ZodError } from "zod";
+import { UserRoles } from "@prisma/client";
 
 const t = initTRPC.context<typeof createTRPCContext>().create({
   transformer: superjson,
@@ -107,8 +108,9 @@ export const createTRPCRouter = t.router;
 export const publicProcedure = t.procedure;
 
 /** Reusable middleware that enforces users are logged in before running the procedure. */
+// remake the protected procedure to use the user.role to check if they are allowed to access the procedure
 const enforceUserIsAuthed = t.middleware(({ ctx, next }) => {
-  if (!ctx.session || !ctx.session.user) {
+  if (!ctx.session /*  || !ctx.session.user */) {
     throw new TRPCError({ code: "UNAUTHORIZED" });
   }
   return next({
@@ -119,6 +121,27 @@ const enforceUserIsAuthed = t.middleware(({ ctx, next }) => {
   });
 });
 
+const enforceUserIsVet = t.middleware(({ ctx, next }) => {
+  if (!ctx.session || ctx.session.user.role !== UserRoles.VET) {
+    throw new TRPCError({ code: "UNAUTHORIZED" });
+  }
+  return next({
+    ctx: {
+      session: { ...ctx.session, user: ctx.session.user },
+    },
+  });
+});
+
+const enforceUserIsClient = t.middleware(({ ctx, next }) => {
+  if (!ctx.session || ctx.session.user.role !== UserRoles.CLIENT) {
+    throw new TRPCError({ code: "UNAUTHORIZED" });
+  }
+  return next({
+    ctx: {
+      session: { ...ctx.session, user: ctx.session.user },
+    },
+  });
+});
 /**
  * Protected (authenticated) procedure
  *
@@ -128,3 +151,5 @@ const enforceUserIsAuthed = t.middleware(({ ctx, next }) => {
  * @see https://trpc.io/docs/procedures
  */
 export const protectedProcedure = t.procedure.use(enforceUserIsAuthed);
+export const vetProcedure = t.procedure.use(enforceUserIsVet);
+export const clientProcedure = t.procedure.use(enforceUserIsClient);

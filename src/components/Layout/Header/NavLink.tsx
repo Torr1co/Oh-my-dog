@@ -25,7 +25,7 @@ export default function NavLink({ link }: { link: NavItem }) {
       <Dropdown className={cn(isActive && "text-primary")} label={link.label}>
         <div className="flex flex-col gap-1">
           {Object.values(link.children).map((child) => (
-            <Link key={child.href} href={link.href + child.href}>
+            <Link key={child.href} href={child.href}>
               <Dropdown.Item>
                 {({ active }) => (
                   <div

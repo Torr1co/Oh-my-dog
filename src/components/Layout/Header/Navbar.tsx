@@ -9,20 +9,32 @@ export type NavItem = {
 };
 export type NavConfig = Record<string, NavItem>;
 
+export const LINKS = {
+  home: "/",
+  services: "/services",
+  clients: "/admin/clients",
+  signin: "/auth/signin",
+  dogAssistance: "/dog-assistance",
+  adoptions: "/dog-assistance/adoptions",
+  crossBreeds: "/dog-assistance/cross-breeds",
+  donationCampaigns: "/dog-assistance/donation-campaigns",
+  lostDogs: "/dog-assistance/lost-dogs",
+} as const;
+
 export const navConfig = {
-  home: { label: "Inicio", href: "/" },
+  home: { label: "Inicio", href: LINKS.home },
   services: {
     label: "Servicios",
-    href: "/services",
+    href: LINKS.services,
     roles: ["Client", null],
   },
   admin: {
     label: "Administracion",
-    href: "/vet",
+    href: "/admin",
     roles: ["VET"],
     children: {
-      services: { label: "Servicios", href: "/services" },
-      clients: { label: "Clientes", href: "/clients" },
+      services: { label: "Servicios", href: LINKS.services },
+      clients: { label: "Clientes", href: LINKS.clients },
     },
   },
   dogAssistance: {
@@ -31,20 +43,24 @@ export const navConfig = {
     children: {
       adoptions: {
         label: "Adopciones",
-        href: "/adoptions",
+        href: LINKS.adoptions,
       },
-      crossBreeds: { label: "Cruza", href: "/cross-breeds", roles: ["Client"] },
+      crossBreeds: {
+        label: "Cruza",
+        href: LINKS.crossBreeds,
+        roles: ["Client"],
+      },
       donationCampaigns: {
         label: "Campañas de donacion",
-        href: "/donation-campaigns",
+        href: LINKS.donationCampaigns,
       },
       lostDogs: {
         label: "Busqueda de perros",
-        href: "/lost-dogs",
+        href: LINKS.lostDogs,
       },
     },
   },
-  signin: { label: "Iniciar sesion", href: "/signin" },
+  signin: { label: "Iniciar sesion", href: "/auth/signin" },
 };
 
 export default function Navbar() {
