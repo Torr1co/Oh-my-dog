@@ -1,7 +1,5 @@
 import React from "react";
 
-const Adoptions = () => {
+export default function adoptions() {
   return <div>adoptions</div>;
-};
-
-export default Adoptions;
+}

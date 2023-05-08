@@ -1,4 +1,3 @@
-import { UserRoles } from "@prisma/client";
 import { hashSync } from "bcryptjs";
 import { z } from "zod";
 import { UserCreationSchema } from "~/schemas/user";
@@ -12,7 +11,7 @@ export const usersRouter = createTRPCRouter({
 
       // Hash the password with the secret key
       const hashedPassword = hashSync(
-        password + (process.env.HASH_PASSWORD ?? ""),
+        password + process.env.HASHED_PASSWORD,
         10
       );
 
@@ -20,7 +19,6 @@ export const usersRouter = createTRPCRouter({
       return ctx.prisma.user.create({
         data: {
           ...userData,
-          role: UserRoles.CLIENT,
           password: hashedPassword,
         },
       });
