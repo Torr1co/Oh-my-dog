@@ -81,6 +81,9 @@ export default function UrgencyForm() {
             if (!value) {
               methods.setValue("castration", undefined);
             }
+            else{
+              methods.setValue("castration.succesful", false);
+            }
           }}
         />
       )}

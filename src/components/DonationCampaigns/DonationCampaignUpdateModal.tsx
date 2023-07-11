@@ -41,7 +41,7 @@ export default function DonationCampaignUpdateModal({
       onSubmit={(data) => {
         updatePublication(data, {
           onSuccess: () => {
-            toast.success("Publicacion creada con exito");
+            toast.success("La campaña fue actualizada con exito");
             handleModal();
           },
           onError: (err) => toast.error(err.message),
