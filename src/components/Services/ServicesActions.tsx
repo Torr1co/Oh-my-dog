@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import Button from "../_common/Button";
 import { type Service } from "@prisma/client";
 import { useModal } from "~/context/ModalContex";
@@ -11,6 +11,7 @@ import { ServiceOptions } from "~/schemas/serviceSchema";
 import { useSession } from "next-auth/react";
 import ServiceContactModal from "./ServiceContactModal";
 import { isVet } from "~/utils/schemas/usersUtils";
+import { toast } from "react-hot-toast";
 
 export const ServicesFilters = () => {
   const { data: session } = useSession();
@@ -48,6 +49,7 @@ export const ServicesFilters = () => {
 
 const EnableService = ({ service }: { service: Service }) => {
   const utils = api.useContext();
+  const [open, setOpen] = useState(false);
   const { mutate: updateService, isLoading } = api.services.update.useMutation({
     onSuccess: async () => {
       await utils.services.getAll.invalidate();
@@ -55,14 +57,32 @@ const EnableService = ({ service }: { service: Service }) => {
   });
   return (
     <ConfirmTooltip
+      open={open}
+      onReject={() => setOpen(false)}
       onConfirm={() => {
-        updateService({
-          id: service.id,
-          availability: !service.availability,
-        });
+        updateService(
+          {
+            id: service.id,
+            availability: !service.availability,
+          },
+          {
+            onSuccess: () => {
+              setOpen(false);
+              toast.success(
+                `Servicio ${
+                  service.availability ? "deshabilitado" : "habilitado"
+                } exitosamente`
+              );
+            },
+          }
+        );
       }}
     >
-      <Button kind={Button.KINDS.gray} loading={isLoading}>
+      <Button
+        kind={Button.KINDS.gray}
+        loading={isLoading}
+        onClick={() => setOpen(true)}
+      >
         {service.availability ? "Deshabilitar" : "Habilitar"}
       </Button>
     </ConfirmTooltip>

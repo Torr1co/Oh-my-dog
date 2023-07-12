@@ -245,9 +245,9 @@ model DonationCampaign {
     status        DonationCampaignStatus @default(ACTIVE)
     title         String
     reason        String
-    amountGoal    Int
+    amountGoal    Float
     endDate       DateTime
-    currentAmount Int                    @default(0)
+    currentAmount Float                    @default(0)
     img           String?
     donations     Donation[]
 }

@@ -69,7 +69,7 @@ const PetPage = (props: { pet: string }) => {
     api.pets.update.useMutation();
   const { mutate: disablePet, isLoading: isDisabling } =
     api.pets.disable.useMutation();
-
+  console.log(pet.bookings);
   if (!session) return <></>;
   return (
     <div>

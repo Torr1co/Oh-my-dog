@@ -4,6 +4,7 @@ import { type BookingRelated } from "~/schemas/bookingSchema";
 
 export default function InquirieInfo({ booking }: { booking: BookingRelated }) {
   const inquirie = booking.inquirie as Inquirie;
+  console.log(booking);
   return (
     <dl className="grid grid-cols-2 gap-4">
       {!!inquirie.height && (

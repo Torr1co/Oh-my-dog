@@ -28,13 +28,11 @@ const DonationCampaigns = () => {
         {/* {Mejora este mensaje} */}
         <Title>Campañas de donacion</Title>
         <div className="flex gap-4">
-          {session && (
-            <Toggle
-              label="Ver campañas finalizadas"
-              checked={finished}
-              onChange={() => setFinished((prev) => !prev)}
-            />
-          )}
+          <Toggle
+            label="Ver campañas finalizadas"
+            checked={finished}
+            onChange={() => setFinished((prev) => !prev)}
+          />
           {isVet(session?.user) && (
             <Button
               kind={Button.KINDS.gray}

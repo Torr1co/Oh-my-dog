@@ -8,6 +8,7 @@ export default function BookingInfoList({
 }: {
   bookings: BookingRelated[];
 }) {
+  console.log(bookings);
   return (
     <ul className="grid grid-cols-2 gap-6">
       {bookings.length === 0 ? (
