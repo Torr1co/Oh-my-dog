@@ -26,7 +26,7 @@ export const clientsRouter = createTRPCRouter({
 
       BookingErrorHandlers.isAlreadyCastrated(booking.type, dog.castrated);
       await BookingErrorHandlers.checkMaxBookings(ctx.prisma, booking);
-      if (booking.type === "VACCINE" && booking.vaccine === "B") {
+      if (booking.type === "VACCINE" && booking.vaccineType === "B") {
         BookingErrorHandlers.isPuppy(dog.birth);
       }
 
@@ -53,9 +53,6 @@ export const clientsRouter = createTRPCRouter({
           const dogCreation = await prisma.pet.create({
             data: {
               ...dog,
-              healthBook: {
-                create: {},
-              },
               owner: {
                 connect: {
                   id: client.id,

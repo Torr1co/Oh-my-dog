@@ -4,7 +4,7 @@ import { prisma } from "~/server/db";
 
 interface QueryProps {
   campaignId: string;
-  userId: string;
+  userId?: string;
   amount: string;
   ["data.id"]: string;
 }
@@ -24,11 +24,15 @@ export default async function handler(
             id: campaignId,
           },
         },
-        user: {
-          connect: {
-            id: userId,
-          },
-        },
+        ...(userId
+          ? {
+              user: {
+                connect: {
+                  id: userId,
+                },
+              },
+            }
+          : {}),
       },
     });
     const campaign = await prisma.donationCampaign.findUnique({
@@ -60,17 +64,18 @@ export default async function handler(
             : "ACTIVE",
       },
     });
-
-    await prisma.user.update({
-      where: {
-        id: userId,
-      },
-      data: {
-        discountAmount: {
-          increment: parseInt(amount),
+    if (userId) {
+      await prisma.user.update({
+        where: {
+          id: userId,
         },
-      },
-    });
+        data: {
+          discountAmount: {
+            increment: parseInt(amount),
+          },
+        },
+      });
+    }
 
     return res.status(200).json({});
   }

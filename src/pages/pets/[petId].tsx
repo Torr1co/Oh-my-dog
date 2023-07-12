@@ -35,6 +35,9 @@ export const getServerSideProps: GetServerSideProps = async (ctx) => {
   try {
     const trpc = petsRouter.createCaller({ session, prisma });
     const pet = await trpc.get(ctx.params.petId);
+    if (pet.ownerId !== session.user.id || !!pet.disabled) {
+      throw new Error("No puedes acceder a este perro");
+    }
     return {
       props: {
         session,
@@ -69,7 +72,6 @@ const PetPage = (props: { pet: string }) => {
     api.pets.update.useMutation();
   const { mutate: disablePet, isLoading: isDisabling } =
     api.pets.disable.useMutation();
-  console.log(pet.bookings);
   if (!session) return <></>;
   return (
     <div>
